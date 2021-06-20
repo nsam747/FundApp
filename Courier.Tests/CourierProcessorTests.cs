@@ -31,6 +31,27 @@ namespace Courier.Tests
             Assert.Equal(courierOrder.TotalCost, 59);
         }
 
+        [Fact]
+        public void CalculateOrder_Returns_Correct_CourierOrder_Given_An_Order_With_SpeedyShipping()
+        {
+            var parcels = new Parcel[] {
+                new Parcel(10, 1, 23),
+                new Parcel(105, 20, 20),
+                new Parcel(3, 4, 2),
+                new Parcel(80, 60, 20),
+                new Parcel(10, 30, 5),
+            };
+
+            var order = new Order(parcels);
+
+            var courierOrder = CourierProcessor.CalculateOrder(order, true);
+            
+            Assert.True(courierOrder.UseSpeedyShipping);
+            Assert.Equal(courierOrder.Items.Count, parcels.Length + 1);
+            Assert.Equal(courierOrder.Items.ElementAt(5).Type, ParcelType.SpeedShipping);
+            Assert.Equal(courierOrder.TotalCost, 118);
+        }
+
         [Theory]
         [InlineData(1,1,1, ParcelType.Small)]
         [InlineData(9,9,9, ParcelType.Small)]

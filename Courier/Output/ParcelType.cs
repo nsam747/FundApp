@@ -5,7 +5,9 @@ namespace Courier.Output
         Small,
         Medium,
         Large,
-        ExtraLarge
+        ExtraLarge,
+
+        SpeedShipping
 
     }
 }

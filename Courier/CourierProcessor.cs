@@ -14,16 +14,21 @@ namespace Courier
             { ParcelType.Large, 15 },
             { ParcelType.ExtraLarge, 25 }
         };
-        public static CourierOrder CalculateOrder(Order order)
+        public static CourierOrder CalculateOrder(Order order, bool speedyShipping = false)
         {
             var items = order.Items.Select(item =>
             {
                 var parcelType = CalculateParcelType(item);
                 var cost = CalculateParcelTypeCost(parcelType);
                 return new CourierParcel(parcelType, cost);
-            }).ToArray();
+            }).ToList();
 
-            return new CourierOrder(items);
+            if(speedyShipping) {
+                var speedyShippingEntry = new CourierParcel(ParcelType.SpeedShipping, items.Sum(item => item.Cost));
+                items.Add(speedyShippingEntry);
+            }
+
+            return new CourierOrder(items, speedyShipping);
         }
 
         public static ParcelType CalculateParcelType(Parcel parcel)
