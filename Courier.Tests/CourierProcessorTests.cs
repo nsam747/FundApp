@@ -22,13 +22,13 @@ namespace Courier.Tests
             var order = new Order(parcels);
 
             var courierOrder = CourierProcessor.CalculateOrder(order);
-            Assert.Equal(courierOrder.Items.Count, parcels.Length);
-            Assert.Equal(courierOrder.Items.ElementAt(0).Type, ParcelType.Medium);
-            Assert.Equal(courierOrder.Items.ElementAt(1).Type, ParcelType.ExtraLarge);
-            Assert.Equal(courierOrder.Items.ElementAt(2).Type, ParcelType.Small);
-            Assert.Equal(courierOrder.Items.ElementAt(3).Type, ParcelType.Large);
-            Assert.Equal(courierOrder.Items.ElementAt(4).Type, ParcelType.Medium);
-            Assert.Equal(courierOrder.TotalCost, 59);
+            Assert.Equal(parcels.Length, courierOrder.Items.Count);
+            Assert.Equal(ParcelType.Medium, courierOrder.Items.ElementAt(0).Type);
+            Assert.Equal(ParcelType.ExtraLarge, courierOrder.Items.ElementAt(1).Type);
+            Assert.Equal(ParcelType.Small, courierOrder.Items.ElementAt(2).Type);
+            Assert.Equal(ParcelType.Large, courierOrder.Items.ElementAt(3).Type);
+            Assert.Equal(ParcelType.Medium, courierOrder.Items.ElementAt(4).Type);
+            Assert.Equal(59, courierOrder.TotalCost);
         }
 
         [Fact]
@@ -47,9 +47,9 @@ namespace Courier.Tests
             var courierOrder = CourierProcessor.CalculateOrder(order, true);
 
             Assert.True(courierOrder.UseSpeedyShipping);
-            Assert.Equal(courierOrder.Items.Count, parcels.Length + 1);
-            Assert.Equal(courierOrder.Items.ElementAt(5).Type, ParcelType.SpeedShipping);
-            Assert.Equal(courierOrder.TotalCost, 118);
+            Assert.Equal(parcels.Length + 1, courierOrder.Items.Count);
+            Assert.Equal(ParcelType.SpeedShipping, courierOrder.Items.ElementAt(5).Type);
+            Assert.Equal(118, courierOrder.TotalCost);
         }
 
         [Theory]
@@ -66,7 +66,7 @@ namespace Courier.Tests
         {
             var parcel = new Parcel(height, width, length, 1);
             var parcelType = CourierProcessor.CalculateParcelType(parcel);
-            Assert.Equal(parcelType, expectedParcelType);
+            Assert.Equal(expectedParcelType, parcelType);
         }
 
         [Theory]
@@ -86,7 +86,7 @@ namespace Courier.Tests
         public void CalculateParcelCost_Returns_Correct_Cost_Given_A_ParcelType_And_Weight_Within_The_Weight_Limit(ParcelType parcelType, decimal weight, decimal expectedCost)
         {
             var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
-            Assert.Equal(cost, expectedCost);
+            Assert.Equal(expectedCost, cost);
         }
 
         [Theory]
@@ -97,7 +97,16 @@ namespace Courier.Tests
         public void CalculateParcelCost_Returns_Correct_Cost_Given_A_ParcelType_And_Weight_Outside_The_Weight_Limit(ParcelType parcelType, decimal weight, decimal expectedCost)
         {
             var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
-            Assert.Equal(cost, expectedCost);
+            Assert.Equal(expectedCost, cost);
+        }
+
+        [Theory]
+        [InlineData(ParcelType.Small, 32, 50)]
+        [InlineData(ParcelType.Medium, 34 , 50)]
+        public void CalculateParcelCost_Returns_Correct_Cost_Given_A_ParcelType_Eligible_For_HeavyWeight_Classification(ParcelType parcelType, decimal weight, decimal expectedCost)
+        {
+            var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
+            Assert.Equal(expectedCost, cost);
         }
     }
 }

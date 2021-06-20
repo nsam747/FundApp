@@ -81,7 +81,12 @@ namespace Courier
             var weightLimit = ParcelTypeWeightLimitMap[parcelType];
             if(weight > weightLimit) {
                 var weightFee = (weight - weightLimit) * 2;
-                return weightFee + baseCost;
+                var cost = weightFee + baseCost;
+                
+                // Calculate Heavy Parcel alternative
+                var heavyParcelWeightFee = weight > 50 ? (weight - 50) * 2 : 0;
+                var heavyParcelCost = 50 + heavyParcelWeightFee;
+                return Math.Min(cost, heavyParcelCost);
             } else {
                 return baseCost;
             }
