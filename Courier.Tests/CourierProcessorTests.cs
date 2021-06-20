@@ -12,11 +12,11 @@ namespace Courier.Tests
         public void CalculateOrder_Returns_Correct_CourierOrder_Given_An_Order()
         {
             var parcels = new Parcel[] {
-                new Parcel(10, 1, 23),
-                new Parcel(105, 20, 20),
-                new Parcel(3, 4, 2),
-                new Parcel(80, 60, 20),
-                new Parcel(10, 30, 5),
+                new Parcel(10, 1, 23, 1),
+                new Parcel(105, 20, 20, 1),
+                new Parcel(3, 4, 2, 1),
+                new Parcel(80, 60, 20, 1),
+                new Parcel(10, 30, 5, 1),
             };
 
             var order = new Order(parcels);
@@ -35,17 +35,17 @@ namespace Courier.Tests
         public void CalculateOrder_Returns_Correct_CourierOrder_Given_An_Order_With_SpeedyShipping()
         {
             var parcels = new Parcel[] {
-                new Parcel(10, 1, 23),
-                new Parcel(105, 20, 20),
-                new Parcel(3, 4, 2),
-                new Parcel(80, 60, 20),
-                new Parcel(10, 30, 5),
+                new Parcel(10, 1, 23, 1),
+                new Parcel(105, 20, 20, 1),
+                new Parcel(3, 4, 2, 1),
+                new Parcel(80, 60, 20, 1),
+                new Parcel(10, 30, 5, 1),
             };
 
             var order = new Order(parcels);
 
             var courierOrder = CourierProcessor.CalculateOrder(order, true);
-            
+
             Assert.True(courierOrder.UseSpeedyShipping);
             Assert.Equal(courierOrder.Items.Count, parcels.Length + 1);
             Assert.Equal(courierOrder.Items.ElementAt(5).Type, ParcelType.SpeedShipping);
@@ -64,28 +64,39 @@ namespace Courier.Tests
         [InlineData(1,1,100, ParcelType.ExtraLarge)]
         public void CalculateParcelType_Returns_Correct_ParcelType_Given_A_Valid_Parcel(decimal height, decimal width, decimal length, ParcelType expectedParcelType)
         {
-            var parcel = new Parcel(height, width, length);
+            var parcel = new Parcel(height, width, length, 1);
             var parcelType = CourierProcessor.CalculateParcelType(parcel);
             Assert.Equal(parcelType, expectedParcelType);
         }
 
         [Theory]
-        [InlineData(0,0,0, ParcelType.Small)]
-        [InlineData(-1,-1,-1, ParcelType.Small)]
-        public void CalculateParcelType_Throws_Exception_Given_An_Invalid_Parcel(decimal height, decimal width, decimal length, ParcelType expectedParcelType)
+        [InlineData(0,0,0,0, ParcelType.Small)]
+        [InlineData(-1,-1,-1,-1, ParcelType.Small)]
+        public void CalculateParcelType_Throws_Exception_Given_An_Invalid_Parcel(decimal height, decimal width, decimal length, decimal weight, ParcelType expectedParcelType)
         {
-            var parcel = new Parcel(height, width, length);
+            var parcel = new Parcel(height, width, length, weight);
             Assert.Throws<Exception>(() => CourierProcessor.CalculateParcelType(parcel));
         }
 
         [Theory]
-        [InlineData(ParcelType.Small, 3)]
-        [InlineData(ParcelType.Medium, 8)]
-        [InlineData(ParcelType.Large, 15)]
-        [InlineData(ParcelType.ExtraLarge, 25)]
-        public void CalculateParcelTypeCost_Returns_Correct_Cost_Given_A_ParcelType(ParcelType parcelType, decimal expectedCost)
+        [InlineData(ParcelType.Small, 1, 3)]
+        [InlineData(ParcelType.Medium, 3, 8)]
+        [InlineData(ParcelType.Large, 6, 15)]
+        [InlineData(ParcelType.ExtraLarge, 10, 25)]
+        public void CalculateParcelCost_Returns_Correct_Cost_Given_A_ParcelType_And_Weight_Within_The_Weight_Limit(ParcelType parcelType, decimal weight, decimal expectedCost)
         {
-            var cost = CourierProcessor.CalculateParcelTypeCost(parcelType);
+            var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
+            Assert.Equal(cost, expectedCost);
+        }
+
+        [Theory]
+        [InlineData(ParcelType.Small, 2, 5)]
+        [InlineData(ParcelType.Medium, 5, 12)]
+        [InlineData(ParcelType.Large, 7, 17)]
+        [InlineData(ParcelType.ExtraLarge, 12, 29)]
+        public void CalculateParcelCost_Returns_Correct_Cost_Given_A_ParcelType_And_Weight_Outside_The_Weight_Limit(ParcelType parcelType, decimal weight, decimal expectedCost)
+        {
+            var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
             Assert.Equal(cost, expectedCost);
         }
     }

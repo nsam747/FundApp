@@ -14,12 +14,20 @@ namespace Courier
             { ParcelType.Large, 15 },
             { ParcelType.ExtraLarge, 25 }
         };
+
+        private static readonly Dictionary<ParcelType, decimal> ParcelTypeWeightLimitMap = new Dictionary<ParcelType, decimal>{
+            { ParcelType.Small, 1 },
+            { ParcelType.Medium, 3 },
+            { ParcelType.Large, 6 },
+            { ParcelType.ExtraLarge, 10 }
+        };
+
         public static CourierOrder CalculateOrder(Order order, bool speedyShipping = false)
         {
             var items = order.Items.Select(item =>
             {
                 var parcelType = CalculateParcelType(item);
-                var cost = CalculateParcelTypeCost(parcelType);
+                var cost = CalculateParcelCost(parcelType, item.Weight);
                 return new CourierParcel(parcelType, cost);
             }).ToList();
 
@@ -67,9 +75,16 @@ namespace Courier
             }
         }
 
-        public static decimal CalculateParcelTypeCost(ParcelType parcelType)
+        public static decimal CalculateParcelCost(ParcelType parcelType, decimal weight)
         {
-            return ParcelTypeCostMap[parcelType];
+            var baseCost = ParcelTypeCostMap[parcelType];
+            var weightLimit = ParcelTypeWeightLimitMap[parcelType];
+            if(weight > weightLimit) {
+                var weightFee = (weight - weightLimit) * 2;
+                return weightFee + baseCost;
+            } else {
+                return baseCost;
+            }
         }
     }
 }
