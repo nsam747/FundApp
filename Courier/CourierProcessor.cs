@@ -31,6 +31,10 @@ namespace Courier
                 return new CourierParcel(parcelType, cost);
             }).ToList();
 
+            var discounts = GetAvailableDiscounts(items);
+
+            items.AddRange(discounts);
+
             if(speedyShipping) {
                 var speedyShippingEntry = new CourierParcel(ParcelType.SpeedShipping, items.Sum(item => item.Cost));
                 items.Add(speedyShippingEntry);
@@ -90,6 +94,19 @@ namespace Courier
             } else {
                 return baseCost;
             }
+        }
+
+        public static List<CourierParcel> GetAvailableDiscounts(List<CourierParcel> items)
+        {
+            var discounts = new List<CourierParcel>();
+            var everyFourthSmallParcel = items.Where((item, i) => item.Type == ParcelType.Small && (i % 4 == 0)).ToArray();
+            var everyThirdMediumParcel = items.Where((item, i) => item.Type == ParcelType.Medium && (i % 3 == 0)).ToArray();
+            var everyFifthParcel = items.Where((_, i) => (i % 5 == 0)).ToArray();
+            var parcels = everyFifthParcel.Concat(everyThirdMediumParcel).Concat(everyFourthSmallParcel);
+            foreach (var item in parcels) {
+                discounts.Add(new CourierParcel(ParcelType.Discount, Decimal.Negate(item.Cost)));
+            }
+            return discounts;
         }
     }
 }

@@ -3,6 +3,7 @@ using Courier.Input;
 using Courier.Output;
 using System.Linq;
 using Xunit;
+using System.Collections.Generic;
 
 namespace Courier.Tests
 {
@@ -107,6 +108,28 @@ namespace Courier.Tests
         {
             var cost = CourierProcessor.CalculateParcelCost(parcelType, weight);
             Assert.Equal(expectedCost, cost);
+        }
+
+        [Fact]
+        public void GetAvailableDiscounts_Returns_Correct_Discounts()
+        {
+            var items = new List<CourierParcel>() {
+                new CourierParcel(ParcelType.Small, 10),
+                new CourierParcel(ParcelType.Small, 10),
+                new CourierParcel(ParcelType.Small, 10),
+                new CourierParcel(ParcelType.Small, 20),
+                new CourierParcel(ParcelType.Small, 20),
+                new CourierParcel(ParcelType.Small, 20),
+                new CourierParcel(ParcelType.Medium, 20),
+                new CourierParcel(ParcelType.Medium, 20),
+                new CourierParcel(ParcelType.Medium, 20),
+            };
+
+            var discounts = CourierProcessor.GetAvailableDiscounts(items);
+
+            var totalPrice = discounts.Sum(discount => discount.Cost);
+            Assert.Equal(5, discounts.Count);
+            Assert.Equal(-80, totalPrice);
         }
     }
 }
