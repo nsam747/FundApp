@@ -1,6 +1,7 @@
 Some future changes / what I didn't complete:
 
-Extract values such as parcel size price and criteria for parcel type classifications to an appSettings file (i.e allow the processor to be configured with the values instead of hardcoding them)
+Extract values such as parcel size price and criteria for parcel type classifications to a configuration object of sorts to allow the processor to be configured with the values instead of hardcoding them)
+Also for the weight limit values associated with specific parcel types.
 
 Improve exception throwing and add concrete exception types instead of using the base system one
 
