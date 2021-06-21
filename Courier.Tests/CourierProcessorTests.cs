@@ -23,13 +23,13 @@ namespace Courier.Tests
             var order = new Order(parcels);
 
             var courierOrder = CourierProcessor.CalculateOrder(order);
-            Assert.Equal(parcels.Length, courierOrder.Items.Count);
+            Assert.Equal(7, courierOrder.Items.Count);
             Assert.Equal(ParcelType.Medium, courierOrder.Items.ElementAt(0).Type);
             Assert.Equal(ParcelType.ExtraLarge, courierOrder.Items.ElementAt(1).Type);
             Assert.Equal(ParcelType.Small, courierOrder.Items.ElementAt(2).Type);
             Assert.Equal(ParcelType.Large, courierOrder.Items.ElementAt(3).Type);
             Assert.Equal(ParcelType.Medium, courierOrder.Items.ElementAt(4).Type);
-            Assert.Equal(59, courierOrder.TotalCost);
+            Assert.Equal(43, courierOrder.TotalCost);
         }
 
         [Fact]
@@ -48,9 +48,9 @@ namespace Courier.Tests
             var courierOrder = CourierProcessor.CalculateOrder(order, true);
 
             Assert.True(courierOrder.UseSpeedyShipping);
-            Assert.Equal(parcels.Length + 1, courierOrder.Items.Count);
-            Assert.Equal(ParcelType.SpeedShipping, courierOrder.Items.ElementAt(5).Type);
-            Assert.Equal(118, courierOrder.TotalCost);
+            Assert.Equal(8, courierOrder.Items.Count);
+            Assert.Equal(ParcelType.SpeedShipping, courierOrder.Items.ElementAt(7).Type);
+            Assert.Equal(86, courierOrder.TotalCost);
         }
 
         [Theory]
@@ -130,6 +130,7 @@ namespace Courier.Tests
             var totalPrice = discounts.Sum(discount => discount.Cost);
             Assert.Equal(5, discounts.Count);
             Assert.Equal(-80, totalPrice);
+            Assert.True(discounts.All(discount => discount.Type == ParcelType.Discount));
         }
     }
 }
